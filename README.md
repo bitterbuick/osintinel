@@ -41,7 +41,15 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
 
 ### Usage
 
-To be updated as the project progresses.
+## Core Modules and Functions
+
+### 1. Web Request Module
+
+Create a file named `web_request.py` in the `src/modules/` directory.
+
+```bash
+touch src/modules/web_request.py
+
 
 ## Contributing
 
