@@ -19,6 +19,7 @@ from src.modules.dark_web_monitor import DarkWebMonitor
 from src.modules.linkedin_scraper import LinkedinScraper
 from src.modules.github_scraper import GithubScraper
 from src.config import Config
+from src.logger import logger
 
 def main():
     parser = argparse.ArgumentParser(description="OSINT CLI Tool")
@@ -59,52 +60,74 @@ def main():
 
     args = parser.parse_args()
 
-    if args.command == "dns":
-        ip = DNSLookup.get_ip(args.domain)
-        if ip:
-            print(f"The IP address of {args.domain} is {ip}")
+    try:
+        if args.command == "dns":
+            ip = DNSLookup.get_ip(args.domain)
+            if ip:
+                logger.info(f"The IP address of {args.domain} is {ip}")
+            else:
+                logger.error(f"Failed to get IP address for {args.domain}")
 
-    elif args.command == "geo":
-        geolocation = IPGeolocation.get_geolocation(args.ip)
-        if geolocation:
-            print(geolocation)
+        elif args.command == "geo":
+            geolocation = IPGeolocation.get_geolocation(args.ip)
+            if geolocation:
+                logger.info(geolocation)
+            else:
+                logger.error(f"Failed to get geolocation for IP {args.ip}")
 
-    elif args.command == "emails":
-        html_content = WebRequest.fetch_html(args.url)
-        if html_content:
-            emails = EmailExtractor.extract_emails(html_content)
-            if emails:
-                print(f"Found emails: {emails}")
+        elif args.command == "emails":
+            html_content = WebRequest.fetch_html(args.url)
+            if html_content:
+                emails = EmailExtractor.extract_emails(html_content)
+                if emails:
+                    logger.info(f"Found emails: {emails}")
+                else:
+                    logger.warning(f"No emails found at {args.url}")
+            else:
+                logger.error(f"Failed to fetch HTML content from {args.url}")
 
-    elif args.command == "whois":
-        whois_data = WhoisLookup.get_whois(args.domain)
-        if whois_data:
-            print(whois_data)
+        elif args.command == "whois":
+            whois_data = WhoisLookup.get_whois(args.domain)
+            if whois_data:
+                logger.info(whois_data)
+            else:
+                logger.error(f"Failed to perform WHOIS lookup for {args.domain}")
 
-    elif args.command == "twitter":
-        twitter_scraper = TwitterScraper(
-            Config.TWITTER_API_KEY, Config.TWITTER_API_SECRET_KEY,
-            Config.TWITTER_ACCESS_TOKEN, Config.TWITTER_ACCESS_TOKEN_SECRET
-        )
-        tweets = twitter_scraper.get_user_tweets(args.username, args.count)
-        if tweets:
-            print(tweets)
+        elif args.command == "twitter":
+            twitter_scraper = TwitterScraper(
+                Config.TWITTER_API_KEY, Config.TWITTER_API_SECRET_KEY,
+                Config.TWITTER_ACCESS_TOKEN, Config.TWITTER_ACCESS_TOKEN_SECRET
+            )
+            tweets = twitter_scraper.get_user_tweets(args.username, args.count)
+            if tweets:
+                logger.info(tweets)
+            else:
+                logger.error(f"Failed to fetch tweets for user {args.username}")
 
-    elif args.command == "darkweb":
-        page_content = DarkWebMonitor.fetch_tor_page(args.url)
-        if page_content:
-            print(page_content)
+        elif args.command == "darkweb":
+            page_content = DarkWebMonitor.fetch_tor_page(args.url)
+            if page_content:
+                logger.info(page_content)
+            else:
+                logger.error(f"Failed to fetch Tor page {args.url}")
 
-    elif args.command == "linkedin":
-        linkedin_scraper = LinkedinScraper(Config.LINKEDIN_USERNAME, Config.LINKEDIN_PASSWORD)
-        profile = linkedin_scraper.get_profile(args.profile_url)
-        if profile:
-            print(profile)
+        elif args.command == "linkedin":
+            linkedin_scraper = LinkedinScraper(Config.LINKEDIN_USERNAME, Config.LINKEDIN_PASSWORD)
+            profile = linkedin_scraper.get_profile(args.profile_url)
+            if profile:
+                logger.info(profile)
+            else:
+                logger.error(f"Failed to fetch LinkedIn profile {args.profile_url}")
 
-    elif args.command == "github":
-        profile = GithubScraper.get_profile(args.username)
-        if profile:
-            print(profile)
+        elif args.command == "github":
+            profile = GithubScraper.get_profile(args.username)
+            if profile:
+                logger.info(profile)
+            else:
+                logger.error(f"Failed to fetch GitHub profile {args.username}")
+
+    except Exception as e:
+        logger.exception(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
