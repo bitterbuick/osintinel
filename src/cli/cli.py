@@ -16,6 +16,9 @@ from src.modules.email_extractor import EmailExtractor
 from src.modules.whois_lookup import WhoisLookup
 from src.modules.twitter_scraper import TwitterScraper
 from src.modules.dark_web_monitor import DarkWebMonitor
+from src.modules.linkedin_scraper import LinkedinScraper
+from src.modules.github_scraper import GithubScraper
+from src.config import Config
 
 def main():
     parser = argparse.ArgumentParser(description="OSINT CLI Tool")
@@ -46,6 +49,14 @@ def main():
     dark_web_parser = subparsers.add_parser("darkweb", help="Fetch a page from the dark web")
     dark_web_parser.add_argument("url", type=str, help="URL of the dark web page to fetch")
 
+    # Subparser for LinkedIn scraping
+    linkedin_parser = subparsers.add_parser("linkedin", help="Scrape LinkedIn profile")
+    linkedin_parser.add_argument("profile_url", type=str, help="LinkedIn profile URL to scrape")
+
+    # Subparser for GitHub scraping
+    github_parser = subparsers.add_parser("github", help="Scrape GitHub profile")
+    github_parser.add_argument("username", type=str, help="GitHub username to scrape")
+
     args = parser.parse_args()
 
     if args.command == "dns":
@@ -71,12 +82,10 @@ def main():
             print(whois_data)
 
     elif args.command == "twitter":
-        api_key = "your_api_key"
-        api_secret_key = "your_api_secret_key"
-        access_token = "your_access_token"
-        access_token_secret = "your_access_token_secret"
-
-        twitter_scraper = TwitterScraper(api_key, api_secret_key, access_token, access_token_secret)
+        twitter_scraper = TwitterScraper(
+            Config.TWITTER_API_KEY, Config.TWITTER_API_SECRET_KEY,
+            Config.TWITTER_ACCESS_TOKEN, Config.TWITTER_ACCESS_TOKEN_SECRET
+        )
         tweets = twitter_scraper.get_user_tweets(args.username, args.count)
         if tweets:
             print(tweets)
@@ -85,6 +94,17 @@ def main():
         page_content = DarkWebMonitor.fetch_tor_page(args.url)
         if page_content:
             print(page_content)
+
+    elif args.command == "linkedin":
+        linkedin_scraper = LinkedinScraper(Config.LINKEDIN_USERNAME, Config.LINKEDIN_PASSWORD)
+        profile = linkedin_scraper.get_profile(args.profile_url)
+        if profile:
+            print(profile)
+
+    elif args.command == "github":
+        profile = GithubScraper.get_profile(args.username)
+        if profile:
+            print(profile)
 
 if __name__ == "__main__":
     main()
