@@ -1,0 +1,7 @@
+requests
+beautifulsoup4
+python-whois
+tweepy
+linkedin-api
+python-dotenv
+
