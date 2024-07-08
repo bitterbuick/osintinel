@@ -1,4 +1,4 @@
-# OSINT CLI Tool
+# Osintinel
 
 This tool is designed to perform Open Source Intelligence (OSINT) gathering from various sources, similar to Spiderfoot. It will be a command-line interface (CLI) tool written in Python.
 
@@ -24,8 +24,8 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/osint-cli-tool.git
-    cd osint-cli-tool
+    git clone https://github.com/yourusername/osintinel.git
+    cd osintinel
     ```
 
 2. Set up the virtual environment:
@@ -41,15 +41,7 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
 
 ### Usage
 
-## Core Modules and Functions
-
-### 1. Web Request Module
-
-Create a file named `web_request.py` in the `src/modules/` directory.
-
-```bash
-touch src/modules/web_request.py
-```
+To be updated as the project progresses.
 
 ## Contributing
 
@@ -58,3 +50,4 @@ Please read `CONTRIBUTING.md` for details on our code of conduct and the process
 ## License
 
 This project is licensed under the MIT License - see the `LICENSE` file for details.
+

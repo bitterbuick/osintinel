@@ -17,6 +17,7 @@ from src.modules.whois_lookup import WhoisLookup
 from src.modules.twitter_scraper import TwitterScraper
 from src.modules.dark_web_monitor import DarkWebMonitor
 from src.modules.linkedin_scraper import LinkedinScraper
+from src.modules.github_scraper import GithubScraper
 from src.config import Config
 
 def main():
@@ -51,6 +52,10 @@ def main():
     # Subparser for LinkedIn scraping
     linkedin_parser = subparsers.add_parser("linkedin", help="Scrape LinkedIn profile")
     linkedin_parser.add_argument("profile_url", type=str, help="LinkedIn profile URL to scrape")
+
+    # Subparser for GitHub scraping
+    github_parser = subparsers.add_parser("github", help="Scrape GitHub profile")
+    github_parser.add_argument("username", type=str, help="GitHub username to scrape")
 
     args = parser.parse_args()
 
@@ -93,6 +98,11 @@ def main():
     elif args.command == "linkedin":
         linkedin_scraper = LinkedinScraper(Config.LINKEDIN_USERNAME, Config.LINKEDIN_PASSWORD)
         profile = linkedin_scraper.get_profile(args.profile_url)
+        if profile:
+            print(profile)
+
+    elif args.command == "github":
+        profile = GithubScraper.get_profile(args.username)
         if profile:
             print(profile)
 
