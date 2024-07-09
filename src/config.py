@@ -1,6 +1,9 @@
 # src/config.py
 
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Config:
     # Twitter API credentials
@@ -12,8 +15,4 @@ class Config:
     # LinkedIn credentials
     LINKEDIN_USERNAME = os.getenv('LINKEDIN_USERNAME')
     LINKEDIN_PASSWORD = os.getenv('LINKEDIN_PASSWORD')
-
-# Load environment variables from a .env file if necessary
-from dotenv import load_dotenv
-load_dotenv()
 
