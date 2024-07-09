@@ -1,6 +1,12 @@
 # src/modules/twitter_scraper.py
 
 import tweepy
+import os
+
+class TwitterScraper:
+    def __init__(self, bearer_token):
+        print(f"Using bearer token: {bearer_token}")  # Verify if the bearer token is correct
+        self.client = tweepy.Client(bearer_token=bearer_token)
 
 class TwitterScraper:
     def __init__(self, bearer_token):
