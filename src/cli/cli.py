@@ -20,6 +20,9 @@ from src.modules.linkedin_scraper import LinkedinScraper
 from src.modules.github_scraper import GithubScraper
 from src.config import Config
 from src.logger import logger
+from src.report_generator import ReportGenerator
+from src.username_generator import UsernameGenerator
+import sherlock
 
 def main():
     parser = argparse.ArgumentParser(description="OSINT CLI Tool")
@@ -58,6 +61,11 @@ def main():
     github_parser = subparsers.add_parser("github", help="Scrape GitHub profile")
     github_parser.add_argument("username", type=str, help="GitHub username to scrape")
 
+    # Subparser for username search
+    username_parser = subparsers.add_parser("username_search", help="Generate and search usernames")
+    username_parser.add_argument("first_name", type=str, help="First name")
+    username_parser.add_argument("last_name", type=str, help="Last name")
+
     args = parser.parse_args()
 
     try:
@@ -65,6 +73,7 @@ def main():
             ip = DNSLookup.get_ip(args.domain)
             if ip:
                 logger.info(f"The IP address of {args.domain} is {ip}")
+                ReportGenerator.save_report({"domain": args.domain, "ip": ip}, "dns_report.json")
             else:
                 logger.error(f"Failed to get IP address for {args.domain}")
 
@@ -72,6 +81,7 @@ def main():
             geolocation = IPGeolocation.get_geolocation(args.ip)
             if geolocation:
                 logger.info(geolocation)
+                ReportGenerator.save_report({"ip": args.ip, "geolocation": geolocation}, "geo_report.json")
             else:
                 logger.error(f"Failed to get geolocation for IP {args.ip}")
 
@@ -81,6 +91,7 @@ def main():
                 emails = EmailExtractor.extract_emails(html_content)
                 if emails:
                     logger.info(f"Found emails: {emails}")
+                    ReportGenerator.save_report({"url": args.url, "emails": emails}, "emails_report.json")
                 else:
                     logger.warning(f"No emails found at {args.url}")
             else:
@@ -90,6 +101,7 @@ def main():
             whois_data = WhoisLookup.get_whois(args.domain)
             if whois_data:
                 logger.info(whois_data)
+                ReportGenerator.save_report({"domain": args.domain, "whois": whois_data}, "whois_report.json")
             else:
                 logger.error(f"Failed to perform WHOIS lookup for {args.domain}")
 
@@ -101,6 +113,7 @@ def main():
             tweets = twitter_scraper.get_user_tweets(args.username, args.count)
             if tweets:
                 logger.info(tweets)
+                ReportGenerator.save_report({"username": args.username, "tweets": tweets}, "twitter_report.json")
             else:
                 logger.error(f"Failed to fetch tweets for user {args.username}")
 
@@ -108,6 +121,7 @@ def main():
             page_content = DarkWebMonitor.fetch_tor_page(args.url)
             if page_content:
                 logger.info(page_content)
+                ReportGenerator.save_report({"url": args.url, "content": page_content}, "darkweb_report.json")
             else:
                 logger.error(f"Failed to fetch Tor page {args.url}")
 
@@ -116,6 +130,7 @@ def main():
             profile = linkedin_scraper.get_profile(args.profile_url)
             if profile:
                 logger.info(profile)
+                ReportGenerator.save_report({"profile_url": args.profile_url, "profile": profile}, "linkedin_report.json")
             else:
                 logger.error(f"Failed to fetch LinkedIn profile {args.profile_url}")
 
@@ -123,8 +138,17 @@ def main():
             profile = GithubScraper.get_profile(args.username)
             if profile:
                 logger.info(profile)
+                ReportGenerator.save_report({"username": args.username, "profile": profile}, "github_report.json")
             else:
                 logger.error(f"Failed to fetch GitHub profile {args.username}")
+
+        elif args.command == "username_search":
+            usernames = UsernameGenerator.generate_usernames(args.first_name, args.last_name)
+            results = {}
+            for username in usernames:
+                results[username] = sherlock.search(username, silent=True)
+            logger.info(results)
+            ReportGenerator.save_report({"first_name": args.first_name, "last_name": args.last_name, "results": results}, "username_search_report.json")
 
     except Exception as e:
         logger.exception(f"An error occurred: {e}")
