@@ -45,9 +45,8 @@ def main():
     whois_parser.add_argument("domain", type=str, help="Domain to perform WHOIS lookup on")
 
     # Subparser for Twitter scraping
-    twitter_parser = subparsers.add_parser("twitter", help="Scrape tweets from a Twitter user")
-    twitter_parser.add_argument("username", type=str, help="Twitter username to scrape tweets from")
-    twitter_parser.add_argument("--count", type=int, default=10, help="Number of tweets to scrape")
+    twitter_parser = subparsers.add_parser("twitter", help="Fetch Twitter profile information")
+    twitter_parser.add_argument("username", type=str, help="Twitter username to fetch profile info from")
 
     # Subparser for Dark Web monitoring
     dark_web_parser = subparsers.add_parser("darkweb", help="Fetch a page from the dark web")
@@ -109,12 +108,12 @@ def main():
             twitter_scraper = TwitterScraper(
                 bearer_token=Config.TWITTER_BEARER_TOKEN
             )
-            tweets = twitter_scraper.get_user_tweets(args.username, args.count)
-            if tweets:
-                logger.info(tweets)
-                ReportGenerator.save_report({"username": args.username, "tweets": tweets}, "twitter_report.json")
+            profile = twitter_scraper.get_user_profile(args.username)
+            if profile:
+                logger.info(profile)
+                ReportGenerator.save_report({"username": args.username, "profile": profile}, "twitter_profile_report.json")
             else:
-                logger.error(f"Failed to fetch tweets for user {args.username}")
+                logger.error(f"Failed to fetch profile for user {args.username}")
 
         elif args.command == "darkweb":
             page_content = DarkWebMonitor.fetch_tor_page(args.url)

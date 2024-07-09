@@ -4,27 +4,28 @@ import tweepy
 
 class TwitterScraper:
     def __init__(self, bearer_token):
-        self.client = tweepy.Client(bearer_token)
+        self.client = tweepy.Client(bearer_token=bearer_token)
 
-    def get_user_tweets(self, username, count=10):
+    def get_user_profile(self, username):
         try:
-            user = self.client.get_user(username=username)
-            user_id = user.data.id
-
-            tweets = self.client.get_users_tweets(id=user_id, max_results=count)
-
-            tweet_list = []
-            for tweet in tweets.data:
-                tweet_list.append({
-                    'id': tweet.id,
-                    'text': tweet.text,
-                    'created_at': tweet.created_at,
-                    'username': username
-                })
-            return tweet_list
+            user = self.client.get_user(username=username, user_fields=['created_at', 'description', 'location', 'public_metrics', 'verified'])
+            user_profile = {
+                'id': user.data.id,
+                'name': user.data.name,
+                'username': user.data.username,
+                'created_at': user.data.created_at,
+                'description': user.data.description,
+                'location': user.data.location,
+                'followers_count': user.data.public_metrics['followers_count'],
+                'following_count': user.data.public_metrics['following_count'],
+                'tweet_count': user.data.public_metrics['tweet_count'],
+                'listed_count': user.data.public_metrics['listed_count'],
+                'verified': user.data.verified
+            }
+            return user_profile
 
         except tweepy.TweepyException as e:
-            print(f"Error fetching tweets for user @{username}: {e}")
+            print(f"Error fetching profile for user @{username}: {e}")
             return None
 
 # Example usage
@@ -37,7 +38,7 @@ if __name__ == "__main__":
     twitter_scraper = TwitterScraper(
         bearer_token=os.getenv('TWITTER_BEARER_TOKEN')
     )
-    tweets = twitter_scraper.get_user_tweets("mountain_goats")
-    if tweets:
-        print(tweets)
+    profile = twitter_scraper.get_user_profile("mountain_goats")
+    if profile:
+        print(profile)
 
