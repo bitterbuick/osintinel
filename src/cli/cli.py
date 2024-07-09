@@ -107,8 +107,11 @@ def main():
 
         elif args.command == "twitter":
             twitter_scraper = TwitterScraper(
-                Config.TWITTER_API_KEY, Config.TWITTER_API_SECRET_KEY,
-                Config.TWITTER_ACCESS_TOKEN, Config.TWITTER_ACCESS_TOKEN_SECRET
+                api_key=Config.TWITTER_API_KEY, 
+                api_secret_key=Config.TWITTER_API_SECRET_KEY,
+                access_token=Config.TWITTER_ACCESS_TOKEN, 
+                access_token_secret=Config.TWITTER_ACCESS_TOKEN_SECRET,
+                bearer_token=Config.TWITTER_BEARER_TOKEN
             )
             tweets = twitter_scraper.get_user_tweets(args.username, args.count)
             if tweets:

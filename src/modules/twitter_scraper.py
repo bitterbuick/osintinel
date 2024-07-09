@@ -3,27 +3,41 @@
 import tweepy
 
 class TwitterScraper:
-    def __init__(self, api_key, api_secret_key, access_token, access_token_secret):
-        auth = tweepy.OAuth1UserHandler(api_key, api_secret_key, access_token, access_token_secret)
-        self.api = tweepy.API(auth)
+    def __init__(self, bearer_token):
+        self.client = tweepy.Client(bearer_token)
 
     def get_user_tweets(self, username, count=10):
         try:
-            tweets = self.api.user_timeline(screen_name=username, count=count, tweet_mode="extended")
-            return [tweet.full_text for tweet in tweets]
-        except Exception as e:
-            print(f"Error fetching tweets for user {username}: {e}")
+            user = self.client.get_user(username=username)
+            user_id = user.data.id
+
+            tweets = self.client.get_users_tweets(id=user_id, max_results=count)
+
+            tweet_list = []
+            for tweet in tweets.data:
+                tweet_list.append({
+                    'id': tweet.id,
+                    'text': tweet.text,
+                    'created_at': tweet.created_at,
+                    'username': username
+                })
+            return tweet_list
+
+        except tweepy.TweepyException as e:
+            print(f"Error fetching tweets for user @{username}: {e}")
             return None
 
 # Example usage
 if __name__ == "__main__":
-    api_key = "your_api_key"
-    api_secret_key = "your_api_secret_key"
-    access_token = "your_access_token"
-    access_token_secret = "your_access_token_secret"
+    import os
+    from dotenv import load_dotenv
 
-    twitter_scraper = TwitterScraper(api_key, api_secret_key, access_token, access_token_secret)
-    tweets = twitter_scraper.get_user_tweets("example_user")
+    load_dotenv()
+
+    twitter_scraper = TwitterScraper(
+        bearer_token=os.getenv('TWITTER_BEARER_TOKEN')
+    )
+    tweets = twitter_scraper.get_user_tweets("mountain_goats")
     if tweets:
         print(tweets)
 
