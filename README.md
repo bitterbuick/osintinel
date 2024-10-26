@@ -41,7 +41,16 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
 
 ### Usage
 
-To be updated as the project progresses.
+*CLI Operation:* Use the command-line interface to initiate OSINT tasks. Typically, you’ll call a Python script or a main.py file (if present) with specific parameters. For example:
+
+```bash
+python main.py --module <module_name> --target <target_info>
+```
+
+*Selecting Modules:* Choose modules for different types of OSINT operations (e.g., WHOIS lookups, IP geolocation) by specifying the module name. Some may require prior setup in configuration files.
+
+*Reviewing Output:* View output in the command line or navigate to designated output folders (e.g., /data or /reports).
+
 
 ## Contributing
 
