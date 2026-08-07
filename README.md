@@ -24,7 +24,7 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/osintinel.git
+    git clone https://github.com/bitterbuick/osintinel.git
     cd osintinel
     ```
 
@@ -39,17 +39,42 @@ This tool is designed to perform Open Source Intelligence (OSINT) gathering from
     pip install -r requirements.txt
     ```
 
+    Only `requests`, `beautifulsoup4` and `python-dotenv` are required. The rest
+    are optional and each is needed by exactly one command — the CLI runs
+    without them and tells you what to install if you reach for one.
+
 ### Usage
 
-*CLI Operation:* Use the command-line interface to initiate OSINT tasks. Typically, you’ll call a Python script or a main.py file (if present) with specific parameters. For example:
+Each OSINT source is a subcommand:
 
 ```bash
-python main.py --module <module_name> --target <target_info>
+python src/cli/cli.py --help              # list every command
+python src/cli/cli.py dns example.com     # resolve a domain
+python src/cli/cli.py geo 8.8.8.8         # geolocate an IP (ipinfo.io)
+python src/cli/cli.py emails https://example.com   # scrape addresses off a page
+python src/cli/cli.py github octocat      # public GitHub profile
+python src/cli/cli.py github octocat --repos       # their public repositories
 ```
 
-*Selecting Modules:* Choose modules for different types of OSINT operations (e.g., WHOIS lookups, IP geolocation) by specifying the module name. Some may require prior setup in configuration files.
+These five need no credentials and no API keys.
 
-*Reviewing Output:* View output in the command line or navigate to designated output folders (e.g., /data or /reports).
+| Command | Extra package | Credentials |
+|---|---|---|
+| `dns`, `geo`, `emails`, `github` | — | none |
+| `whois` | `python-whois` | none |
+| `darkweb` | — | a Tor SOCKS proxy on `127.0.0.1:9050` |
+| `twitter` | `tweepy` | `TWITTER_*` in `.env` |
+| `linkedin` | `linkedin-api` | `LINKEDIN_*` in `.env` |
+
+Credentials are read from a `.env` file in the repository root (see `src/config.py`
+for the variable names). Output is printed to stdout; `data/` and `reports/` are
+there for anything you choose to redirect into them.
+
+### Running the tests
+
+```bash
+python -m unittest discover tests
+```
 
 
 ## Contributing

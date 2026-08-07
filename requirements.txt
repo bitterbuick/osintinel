@@ -1,4 +1,9 @@
 requests
 beautifulsoup4
-python-whois
-tweepy
+python-dotenv
+
+# Optional — only needed by the command listed against each package.
+# The CLI runs without them and tells you what to install if you use that command.
+python-whois   # whois
+tweepy         # twitter
+linkedin-api   # linkedin
