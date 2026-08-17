@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Deliberately install only the core dependencies. The CLI must load and
+      # every subcommand must be reachable without the optional packages.
+      - name: Install core dependencies
+        run: pip install requests beautifulsoup4 python-dotenv
+
+      - name: Run tests
+        run: python -m unittest discover tests -v
+
+      - name: CLI smoke check
+        run: |
+          python src/cli/cli.py --help
+          python src/cli/cli.py dns example.com
